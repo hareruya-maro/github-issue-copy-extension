@@ -1,8 +1,8 @@
 {
   "name": "github-issue-copy-extension",
-  "displayName": "Github issue copy extension",
+  "displayName": "__MSG_extensionName__",
   "version": "0.0.1",
-  "description": "A basic Plasmo extension.",
+  "description": "__MSG_extensionDescription__",
   "author": "Haruya Nakamura",
   "scripts": {
     "dev": "plasmo dev",
@@ -12,6 +12,7 @@
   "dependencies": {
     "@mantine/core": "7.4.2",
     "@mantine/hooks": "7.4.2",
+    "@plasmohq/messaging": "^0.6.2",
     "plasmo": "0.88.0",
     "react": "18.2.0",
     "react-dom": "18.2.0"
@@ -30,8 +31,14 @@
     "typescript": "5.3.3"
   },
   "manifest": {
+    "name": "__MSG_extensionName__",
     "host_permissions": [
-      "https://*/*"
-    ]
+      "https://github.com/*"
+    ],
+    "permissions": [
+      "contextMenus",
+      "tabs"
+    ],
+    "default_locale": "en"
   }
 }

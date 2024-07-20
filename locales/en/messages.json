@@ -1,0 +1,14 @@
+{
+  "extensionName": {
+    "message": "GitHub Issue Copy Extension"
+  },
+  "extensionDescription": {
+    "message": "This extension supports copying and creating new issues on GitHub. "
+  },
+  "MenuNameNewTab": {
+    "message": "Create a copy of the issue (in a new tab)"
+  },
+  "MenuNameCurrentTab": {
+    "message": "Create a copy of the issue (in the current tab)"
+  }
+}
