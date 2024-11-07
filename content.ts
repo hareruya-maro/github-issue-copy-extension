@@ -1,3 +1,4 @@
+import { NodeHtmlMarkdown } from "node-html-markdown"
 import type { PlasmoCSConfig } from "plasmo"
 
 export const config: PlasmoCSConfig = {
@@ -10,28 +11,32 @@ const targetUrlRegex = /^https:\/\/github.com\/(.+)\/(.+)\/issues\/([0-9]+).*$/
 // tabのURLが変わったらbackground.tsにメッセージ送信する
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   // listen for messages sent from background.js
-  const titleElement = document.getElementsByName("issue[title]")
-  const bodyElement = document.getElementsByName("issue[body]")
+  const titleElement = document.getElementsByClassName("markdown-title")
+  const bodyElementList = document.getElementsByClassName("markdown-body")
+  const bodyElement = Array.from(bodyElementList).filter((node) => {
+    return node.parentElement.getAttributeNames().includes("data-testid")
+  })
+
   const assigneeList = document.querySelectorAll(
-    "#partial-discussion-sidebar > div.discussion-sidebar-item.sidebar-assignee.js-discussion-sidebar-item > form > span > p > span > a.assignee.Link--primary > span"
+    '[data-testid="issue-assignees"]'
   )
-  const labelsList = document.querySelectorAll(
-    "#partial-discussion-sidebar > div:nth-child(2) > div > a > span"
-  )
+  const labelsList = document.querySelectorAll('[data-testid="issue-labels"]')
 
   let title = ""
   let body = ""
   let assignees: string[] = []
   let labels: string[] = []
-  if (titleElement.length > 0 && (titleElement[0] as HTMLInputElement).value) {
-    title = encodeURI((titleElement[0] as HTMLInputElement).value!)
+  if (titleElement.length > 0 && (titleElement[0] as HTMLElement).innerText) {
+    title = encodeURI((titleElement[0] as HTMLElement).innerText!)
       .trim()
       .replace(/#/g, "%23")
       .replace(/&/g, "%26")
       .replace(/;/g, "%3B")
   }
-  if (bodyElement.length > 0 && bodyElement[0].textContent) {
-    body = encodeURI(bodyElement[0].textContent)
+  if (bodyElement.length > 0 && bodyElement) {
+    const markdown = NodeHtmlMarkdown.translate(bodyElement[0].innerHTML, {})
+
+    body = encodeURI(markdown)
       .trim()
       .replace(/#/g, "%23")
       .replace(/&/g, "%26")
@@ -56,8 +61,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     sendResponse({
       title,
       body,
-      assignees,
-      labels
+      assignees: assignees.join(","),
+      labels: labels.join(",")
     })
   } else {
     const result = window.location.href.match(targetUrlRegex)
